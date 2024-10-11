@@ -1,0 +1,5 @@
+rootProject.name = 'kafka-example'
+
+include 'common'
+include 'audit-service'
+include 'post-service'

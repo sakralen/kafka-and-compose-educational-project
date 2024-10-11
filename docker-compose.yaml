@@ -1,0 +1,57 @@
+services:
+  post-service-db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+  #    volumes:
+  #      - post-service-db-data:/var/lib/postgresql/data
+
+  audit-service-db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+  #    volumes:
+  #      - audit-service-db-data:/var/lib/postgresql/data
+
+  zookeeper:
+    image: wurstmeister/zookeeper:latest
+
+  kafka:
+    image: wurstmeister/kafka:latest
+    environment:
+      KAFKA_ADVERTISED_HOST_NAME: kafka
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+    depends_on:
+      - zookeeper
+
+  post-service:
+    depends_on:
+      - post-service-db
+      - kafka
+    build:
+      context: ./post-service/
+    environment:
+      DB_URL: post-service-db:5432/postgres
+      DB_USERNAME: postgres
+      DB_PASSWORD: postgres
+      KAFKA_URL: kafka:9092
+    ports:
+      - 8080:8080
+
+  audit-service:
+    depends_on:
+      - audit-service-db
+      - kafka
+    build:
+      context: ./audit-service/
+    environment:
+      DB_URL: audit-service-db:5432/postgres
+      DB_USERNAME: postgres
+      DB_PASSWORD: postgres
+      KAFKA_URL: kafka:9092
+    ports:
+      - 8081:8080

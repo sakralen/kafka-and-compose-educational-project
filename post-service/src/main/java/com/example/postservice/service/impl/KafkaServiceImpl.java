@@ -6,14 +6,18 @@ import com.example.common.entity.Operation;
 import com.example.postservice.service.KafkaService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.kafka.annotation.KafkaListener;
-import org.springframework.kafka.core.KafkaTemplate;
+import org.apache.kafka.common.errors.TimeoutException;
+import org.springframework.kafka.requestreply.ReplyingKafkaTemplate;
+import org.springframework.kafka.requestreply.RequestReplyMessageFuture;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Service;
 
+import java.util.concurrent.ExecutionException;
+
 import static com.example.common.util.TopicConstants.FROM_AUDIT_TOPIC;
 import static com.example.common.util.TopicConstants.TO_AUDIT_TOPIC;
+import static org.springframework.kafka.support.KafkaHeaders.REPLY_TOPIC;
 import static org.springframework.kafka.support.KafkaHeaders.TOPIC;
 
 @Slf4j
@@ -21,13 +25,7 @@ import static org.springframework.kafka.support.KafkaHeaders.TOPIC;
 @Service
 public class KafkaServiceImpl implements KafkaService {
 
-    private final KafkaTemplate<String, AuditedPostDto> kafkaTemplate;
-
-    @Override
-    @KafkaListener(topics = FROM_AUDIT_TOPIC)
-    public void listenForAuditedPost(AuditedPostDto auditedPostDto) {
-        log.info("Audited post {} received back", auditedPostDto);
-    }
+    private final ReplyingKafkaTemplate<String, AuditedPostDto, AuditedPostDto> replyingKafkaTemplate;
 
     @Override
     public void sendForAudit(PostDto postDto, Operation operation) {
@@ -36,11 +34,19 @@ public class KafkaServiceImpl implements KafkaService {
         Message<AuditedPostDto> message = MessageBuilder
                 .withPayload(postToAuditDto)
                 .setHeader(TOPIC, TO_AUDIT_TOPIC)
+                .setHeader(REPLY_TOPIC, FROM_AUDIT_TOPIC)
                 .build();
 
-        kafkaTemplate.send(message);
+        RequestReplyMessageFuture<String, AuditedPostDto> reply = replyingKafkaTemplate.sendAndReceive(message);
 
         log.info("{} operation on {} sent for audit", operation, postDto);
+
+        try {
+            Message<?> repliedMessage = reply.get();
+            log.info("Audit service replied with: {}", repliedMessage.getPayload());
+        } catch (InterruptedException | ExecutionException | TimeoutException exception) {
+            log.info("Audit reply exception: {}", exception.getMessage());
+        }
     }
 
 }

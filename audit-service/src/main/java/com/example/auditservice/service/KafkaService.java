@@ -1,11 +1,12 @@
 package com.example.auditservice.service;
 
 import com.example.common.dto.AuditedPostDto;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
 
 public interface KafkaService {
 
-    void listenForPost(AuditedPostDto auditedPostDto);
+    void listenForPost(ConsumerRecord<String, AuditedPostDto> record);
 
-    void sendBackAudited(AuditedPostDto auditedPostDto);
+    void sendBackAudited(AuditedPostDto savedAuditedPostDto, byte[] replyTopic, byte[] correlationId);
 
 }

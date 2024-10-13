@@ -5,8 +5,8 @@ services:
       POSTGRES_DB: postgres
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-  #    volumes:
-  #      - post-service-db-data:/var/lib/postgresql/data
+#    volumes:
+#      - post-service-db-data:/var/lib/postgresql/data
 
   audit-service-db:
     image: postgres:16
@@ -14,8 +14,8 @@ services:
       POSTGRES_DB: postgres
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-  #    volumes:
-  #      - audit-service-db-data:/var/lib/postgresql/data
+#    volumes:
+#      - audit-service-db-data:/var/lib/postgresql/data
 
   zookeeper:
     image: wurstmeister/zookeeper:latest
@@ -55,3 +55,7 @@ services:
       KAFKA_URL: kafka:9092
     ports:
       - 8081:8080
+
+#volumes:
+#  post-service-db-data:
+#  audit-service-db-data:

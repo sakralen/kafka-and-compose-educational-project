@@ -1,5 +1,5 @@
 # Учебный проект для изучения Kafka и Docker Compose
-## Инструкция по запуску
+## Запустить
 ```bash
 chmod +x build-and-up.sh
 ./build-and-up.sh

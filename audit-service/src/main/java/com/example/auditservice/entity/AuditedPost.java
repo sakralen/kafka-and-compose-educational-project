@@ -29,7 +29,7 @@ import java.util.UUID;
 public class AuditedPost extends AbstractEntity {
 
     @Column(nullable = false)
-    private UUID refId;
+    private UUID postId;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)

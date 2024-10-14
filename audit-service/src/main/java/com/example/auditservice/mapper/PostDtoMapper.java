@@ -13,11 +13,11 @@ import static org.mapstruct.ReportingPolicy.IGNORE;
 public interface PostDtoMapper extends BaseMapper<AuditedPost, PostDto> {
 
     @Override
-    @Mapping(source = "refId", target = "id")
+    @Mapping(source = "postId", target = "id")
     PostDto toDto(AuditedPost auditedPost);
 
     @Override
-    @Mapping(source = "id", target = "refId")
+    @Mapping(source = "id", target = "postId")
     AuditedPost toEntity(PostDto postDto);
 
 }

@@ -9,7 +9,9 @@ public record PostDto(
 
         String content,
 
-        LocalDateTime sentAt
+        LocalDateTime sentAt,
+
+        LocalDateTime lastModifiedAt
 
 ) {
 }

@@ -3,6 +3,9 @@ package com.example.postservice.service.impl;
 import com.example.common.dto.AuditedPostDto;
 import com.example.common.dto.PostDto;
 import com.example.common.entity.Operation;
+import com.example.postservice.entity.Post;
+import com.example.postservice.mapper.AuditedPostDtoMapper;
+import com.example.postservice.mapper.PostDtoMapper;
 import com.example.postservice.service.KafkaService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,9 +30,15 @@ public class KafkaServiceImpl implements KafkaService {
 
     private final ReplyingKafkaTemplate<String, AuditedPostDto, AuditedPostDto> replyingKafkaTemplate;
 
+    private final PostDtoMapper postDtoMapper;
+
+    private final AuditedPostDtoMapper auditedPostDtoMapper;
+
     @Override
     public void sendForAudit(PostDto postDto, Operation operation) {
-        AuditedPostDto postToAuditDto = new AuditedPostDto(null, postDto, operation);
+        Post post = postDtoMapper.toEntity(postDto);
+        AuditedPostDto postToAuditDto = auditedPostDtoMapper.toDto(post);
+        postToAuditDto.setOperation(operation);
 
         Message<AuditedPostDto> message = MessageBuilder
                 .withPayload(postToAuditDto)

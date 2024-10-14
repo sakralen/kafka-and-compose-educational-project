@@ -2,27 +2,32 @@ services:
   post-service-db:
     image: postgres:16
     environment:
+      TZ: Europe/Moscow
       POSTGRES_DB: postgres
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-#    volumes:
-#      - post-service-db-data:/var/lib/postgresql/data
+  #    volumes:
+  #      - post-service-db-data:/var/lib/postgresql/data
 
   audit-service-db:
     image: postgres:16
     environment:
+      TZ: Europe/Moscow
       POSTGRES_DB: postgres
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-#    volumes:
-#      - audit-service-db-data:/var/lib/postgresql/data
+  #    volumes:
+  #      - audit-service-db-data:/var/lib/postgresql/data
 
   zookeeper:
     image: wurstmeister/zookeeper:latest
+    environment:
+      TZ: Europe/Moscow
 
   kafka:
     image: wurstmeister/kafka:latest
     environment:
+#      TZ: Russia/Moscow
       KAFKA_ADVERTISED_HOST_NAME: kafka
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
     depends_on:
@@ -35,6 +40,7 @@ services:
     build:
       context: ./post-service/
     environment:
+      TZ: Europe/Moscow
       DB_URL: post-service-db:5432/postgres
       DB_USERNAME: postgres
       DB_PASSWORD: postgres
@@ -49,6 +55,7 @@ services:
     build:
       context: ./audit-service/
     environment:
+      TZ: Europe/Moscow
       DB_URL: audit-service-db:5432/postgres
       DB_USERNAME: postgres
       DB_PASSWORD: postgres
